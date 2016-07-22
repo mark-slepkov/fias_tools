@@ -2,7 +2,25 @@
 __author__ = 'mark'
 import sys
 import os
-from parsers import AddressObject
+from parsers import (
+    AddressObject,
+    CenterStatus,
+    CurrentStatus,
+    OperationStatus,
+    ActualStatus,
+    AddressObjectType,
+    IntervalStatus,
+    StructureStatus,
+    HouseStateStatus,
+    EstateStatus,
+    NormativeDocumentType,
+    NormativeDocument,
+    Room,
+    Stead,
+    Landmark,
+    HouseInterval,
+    House
+)
 from preparing import *
 from config import Config
 import psycopg2
@@ -45,11 +63,33 @@ if __name__ == '__main__':
         database=db_name,
         cursor_factory=DictCursor
     )
-    addr_parser = AddressObject(os.getcwd() + '/base_xml/AS_ADDROBJ_20160717_3ce5c848-04ab-4e6a-a3fc-a748674e5583.XML', db_connection=db_conn)
-    print(datetime.now())
-    # addr_parser.parse()
+    parsers = [
+        AddressObjectType,
+        CenterStatus,
+        CurrentStatus,
+        OperationStatus,
+        ActualStatus,
+        IntervalStatus,
+        StructureStatus,
+        HouseStateStatus,
+        EstateStatus,
+        NormativeDocumentType,
+        NormativeDocument,
+        AddressObject,
+        Room,
+        Stead,
+        Landmark,
+        HouseInterval,
+        House
+    ]
     db_conn.commit()
-    print(datetime.now())
-    print('========== AddrObj was successfully loaded to database ==========')
+    for parser in parsers:
+        obj_parser = parser(db_connection=db_conn, archive='fias_xml.rar')
+        print('========== '+parser.__name__+' loading to database ==========')
+        print(datetime.now())
+        obj_parser.parse()
+        db_conn.commit()
+        print(datetime.now())
+        print('========== '+parser.__name__+' was successfully loaded to database ==========')
 
 

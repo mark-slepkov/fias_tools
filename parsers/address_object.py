@@ -54,7 +54,7 @@ class AddressObject(Parser):
 
         with self.db_connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO addrobj (
+                INSERT INTO address_objects (
                     id,
                     placecode,
                     postalcode,
@@ -63,7 +63,6 @@ class AddressObject(Parser):
                     sextcode,
                     terrifnsfl,
                     previd,
-                    aoid,
                     ctarcode,
                     plaincode,
                     oktmo,
@@ -94,7 +93,7 @@ class AddressObject(Parser):
                     terrifnsul
                     )
                 VALUES (
-                    DEFAULT,
+                    %(AOID)s,
                     %(PLACECODE)s,
                     %(POSTALCODE)s,
                     %(EXTRCODE)s,
@@ -102,7 +101,6 @@ class AddressObject(Parser):
                     %(SEXTCODE)s,
                     %(TERRIFNSFL)s,
                     %(PREVID)s,
-                    %(AOID)s,
                     %(CTARCODE)s,
                     %(PLAINCODE)s,
                     %(OKTMO)s,
@@ -132,8 +130,7 @@ class AddressObject(Parser):
                     %(OKATO)s,
                     %(TERRIFNSUL)s
                 )
-            """,
-            attributes)
+            """,attributes)
         if self.cache_counter % 100 == 0:
             self.db_connection.commit()
             sys.stdout.write(str(self.cache_counter) + ' records complete \r')

@@ -1,11 +1,97 @@
+
 -- 1
+CREATE TABLE IF NOT EXISTS actual_statuses (
+  id        INT PRIMARY KEY,
+  name      VARCHAR
+);
+COMMENT ON TABLE actual_statuses            IS 'Статус актуальности ФИАС';
+COMMENT ON COLUMN actual_statuses.id        IS 'Идентификатор статуса (ключ)';
+COMMENT ON COLUMN actual_statuses.name      IS 'Наименование
+                                                0 – Не актуальный
+                                                1 – Актуальный (последняя запись по адресному объекту)';
+
+-- 2
+CREATE TABLE IF NOT EXISTS center_statuses (
+  id         INT PRIMARY KEY,
+  name       VARCHAR
+);
+COMMENT ON TABLE center_statuses             IS 'Статус центра';
+COMMENT ON COLUMN center_statuses.id         IS 'Идентификатор статуса';
+COMMENT ON COLUMN center_statuses.name       IS 'Наименование';
+
+-- 3
+CREATE TABLE IF NOT EXISTS current_statuses (
+  id         INT PRIMARY KEY,
+  name       VARCHAR
+);
+COMMENT ON TABLE current_statuses             IS 'Статус актуальности КЛАДР 4.0';
+COMMENT ON COLUMN current_statuses.id         IS 'Идентификатор статуса (ключ)';
+COMMENT ON COLUMN current_statuses.name       IS 'Наименование
+                                                  0 - актуальный,
+                                                  1-50, 2-98 – исторический (кроме 51),
+                                                  51 - переподчиненный,
+                                                  99 - несуществующий';
+
+-- 4
+CREATE TABLE IF NOT EXISTS operation_statuses(
+  id         INT PRIMARY KEY,
+  name       VARCHAR
+);
+COMMENT ON TABLE operation_statuses IS 'Статус действия';
+COMMENT ON COLUMN operation_statuses.id   IS 'Идентификатор статуса (ключ)';
+COMMENT ON COLUMN operation_statuses.name IS 'Наименование';
+
+
+-- 10
+CREATE TABLE IF NOT EXISTS address_object_types (
+  id       VARCHAR PRIMARY KEY,
+  scname   VARCHAR,
+  level    INT,
+  socrname VARCHAR
+
+);
+COMMENT ON TABLE  address_object_types IS 'Состав и структура файла с информацией по типам адресных объектов в БД ФИАС';
+COMMENT ON COLUMN address_object_types.id       IS 'Ключевое поле';
+COMMENT ON COLUMN address_object_types.level    IS 'Уровень адресного объекта';
+COMMENT ON COLUMN address_object_types.scname   IS 'Краткое наименование типа объекта';
+COMMENT ON COLUMN address_object_types.socrname IS 'Полное наименование типа объекта';
+
+
+-- 7
+CREATE TABLE IF NOT EXISTS normative_document_types(
+  id       INT PRIMARY KEY,
+  name     VARCHAR
+);
+COMMENT ON TABLE normative_document_types IS 'Тип нормативного документа';
+COMMENT ON COLUMN normative_document_types.id   IS 'Идентификатор записи (ключ)';
+COMMENT ON COLUMN normative_document_types.name IS 'Наименование типа нормативного документа';
+
+-- 11
+CREATE TABLE IF NOT EXISTS normative_documents(
+  id        VARCHAR PRIMARY KEY,
+  docdate   DATE,
+  docnum    VARCHAR,
+  doctype   INT REFERENCES normative_document_types,
+  docname   VARCHAR,
+  -- Поле не встречается ни у одного объекта
+  docimgid  INT
+);
+COMMENT ON TABLE normative_documents IS 'Сведения по нормативному документу, являющемуся основанием присвоения адресному элементу наименования';
+COMMENT ON COLUMN normative_documents.id        IS 'Идентификатор нормативного документа';
+COMMENT ON COLUMN normative_documents.docname   IS 'Наименование документа';
+COMMENT ON COLUMN normative_documents.docdate   IS 'Дата документа';
+COMMENT ON COLUMN normative_documents.docnum    IS 'Номер документа';
+COMMENT ON COLUMN normative_documents.doctype   IS 'Тип документа';
+COMMENT ON COLUMN normative_documents.docimgid  IS 'Идентификатор образа (внешний ключ)';
+
+-- 0
 CREATE TABLE IF NOT EXISTS address_objects (
-  id         SERIAL PRIMARY KEY,
-  aoid       VARCHAR,
+  id         VARCHAR PRIMARY KEY,
+  aoguid     VARCHAR,
+  parentguid VARCHAR,
   placecode  VARCHAR,
   postalcode VARCHAR,
   extrcode   VARCHAR,
-  aoguid     VARCHAR,
   sextcode   VARCHAR,
   terrifnsfl VARCHAR,
   previd     VARCHAR,
@@ -14,34 +100,34 @@ CREATE TABLE IF NOT EXISTS address_objects (
   oktmo      VARCHAR,
   shortname  VARCHAR,
   formalname VARCHAR,
-  currstatus INT,
+  currstatus INT REFERENCES current_statuses,
   nextid     VARCHAR,
-  enddate    VARCHAR,
+  updatedate DATE,
+  startdate  DATE,
+  enddate    DATE,
   streetcode VARCHAR,
   ifnsul     VARCHAR,
   regioncode VARCHAR,
-  centstatus INT,
-  updatedate VARCHAR,
+  centstatus INT REFERENCES center_statuses,
   autocode   VARCHAR,
-  startdate  VARCHAR,
   aolevel    INT,
-  operstatus INT,
+  operstatus INT REFERENCES operation_statuses,
   citycode   VARCHAR,
-  normdoc    VARCHAR,
-  actstatus  INT,
+  normdoc    VARCHAR REFERENCES normative_documents,
+  actstatus  INT REFERENCES actual_statuses,
   ifnsfl     VARCHAR,
   livestatus VARCHAR,
   areacode   VARCHAR,
-  parentguid VARCHAR,
   code       VARCHAR,
   offname    VARCHAR,
   okato      VARCHAR,
   terrifnsul VARCHAR,
   cadnum     VARCHAR,
-  divtype    INT NOT NULL
+  divtype    INT
 );
 
 COMMENT ON TABLE address_objects IS 'Классификатор адресообразующих элементов ';
+COMMENT ON COLUMN address_objects.id         IS 'Уникальный идентификатор записи. Ключевое поле.';
 COMMENT ON COLUMN address_objects.aoguid     IS 'Глобальный уникальный идентификатор адресного объекта';
 COMMENT ON COLUMN address_objects.formalname IS 'Формализованное наименование';
 COMMENT ON COLUMN address_objects.regioncode IS 'Код региона';
@@ -59,13 +145,12 @@ COMMENT ON COLUMN address_objects.ifnsfl     IS 'Код ИФНС ФЛ';
 COMMENT ON COLUMN address_objects.terrifnsfl IS 'Код территориального участка ИФНС ФЛ';
 COMMENT ON COLUMN address_objects.ifnsul     IS 'Код ИФНС ЮЛ';
 COMMENT ON COLUMN address_objects.terrifnsul IS 'Код территориального участка ИФНС ЮЛ';
-COMMENT ON COLUMN address_objects.okato      IS 'OKATO';
-COMMENT ON COLUMN address_objects.oktmo      IS 'OKTMO';
-COMMENT ON COLUMN address_objects.updatedate IS 'Дата  внесения записи';
+COMMENT ON COLUMN address_objects.okato      IS 'ОКАТО';
+COMMENT ON COLUMN address_objects.oktmo      IS 'ОКТМО';
+COMMENT ON COLUMN address_objects.updatedate IS 'Дата внесения записи';
 COMMENT ON COLUMN address_objects.shortname  IS 'Краткое наименование типа объекта';
 COMMENT ON COLUMN address_objects.aolevel    IS 'Уровень адресного объекта';
 COMMENT ON COLUMN address_objects.parentguid IS 'Идентификатор объекта родительского объекта';
-COMMENT ON COLUMN address_objects.aoid       IS 'Уникальный идентификатор записи. Ключевое поле.';
 COMMENT ON COLUMN address_objects.previd     IS 'Идентификатор записи связывания с предыдушей исторической записью';
 COMMENT ON COLUMN address_objects.nextid     IS 'Идентификатор записи  связывания с последующей исторической записью';
 COMMENT ON COLUMN address_objects.code       IS 'Код адресного объекта одной строкой с признаком актуальности из КЛАДР 4.0. ';
@@ -100,125 +185,107 @@ COMMENT ON COLUMN address_objects.divtype    IS 'Тип адресации:
                                                  1 - муниципальный;
                                                  2 - административно-территориальный';
 
--- 2
-CREATE TABLE IF NOT EXISTS address_object_types (
-  id       SERIAL PRIMARY KEY,
-  scname   VARCHAR,
-  level    INT,
-  socrname VARCHAR,
-  kod_t_st VARCHAR
-);
-COMMENT ON TABLE  address_object_types          IS 'Состав и структура файла с информацией по типам адресных объектов в БД ФИАС';
-COMMENT ON COLUMN address_object_types.level    IS 'Уровень адресного объекта';
-COMMENT ON COLUMN address_object_types.scname   IS 'Краткое наименование типа объекта';
-COMMENT ON COLUMN address_object_types.socrname IS 'Полное наименование типа объекта';
-COMMENT ON COLUMN address_object_types.kod_t_st IS 'Ключевое поле';
-
--- 3
-CREATE TABLE IF NOT EXISTS center_statuses (
-  id         SERIAL PRIMARY KEY,
-  centerstid VARCHAR,
-  name       VARCHAR
-);
-COMMENT ON TABLE center_statuses             IS 'Статус центра';
-COMMENT ON COLUMN center_statuses.centerstid IS 'Идентификатор статуса';
-COMMENT ON COLUMN center_statuses.name       IS 'Наименование';
-
--- 4
-CREATE TABLE IF NOT EXISTS actual_statuses (
-  id        SERIAL PRIMARY KEY,
-  actstatid INT,
+-- 5
+CREATE TABLE IF NOT EXISTS house_state_statuses(
+  id        INT PRIMARY KEY,
   name      VARCHAR
 );
-COMMENT ON TABLE actual_statuses            IS 'Статус актуальности ФИАС';
-COMMENT ON COLUMN actual_statuses.actstatid IS 'Идентификатор статуса (ключ)';
-COMMENT ON COLUMN actual_statuses.name      IS 'Наименование
-                                                0 – Не актуальный
-                                                1 – Актуальный (последняя запись по адресному объекту)';
--- 5
-CREATE TABLE IF NOT EXISTS current_statuses (
-  id         SERIAL PRIMARY KEY,
-  curentstid VARCHAR,
-  name       VARCHAR
+COMMENT ON TABLE  house_state_statuses IS 'Статус состояния домов';
+COMMENT ON COLUMN house_state_statuses.id IS 'Идентификатор статуса';
+COMMENT ON COLUMN house_state_statuses.name      IS 'Наименование';
+
+-- 8
+CREATE TABLE IF NOT EXISTS structure_statuses(
+  id        INT PRIMARY KEY,
+  shortname VARCHAR,
+  name      VARCHAR
 );
-COMMENT ON TABLE current_statuses             IS 'Статус актуальности КЛАДР 4.0';
-COMMENT ON COLUMN current_statuses.curentstid IS 'Идентификатор статуса (ключ)';
-COMMENT ON COLUMN current_statuses.name       IS 'Наименование
-                                                  0 - актуальный,
-                                                  1-50, 2-98 – исторический (кроме 51),
-                                                  51 - переподчиненный,
-                                                  99 - несуществующий';
--- 6
+COMMENT ON TABLE structure_statuses IS 'Признак строения';
+COMMENT ON COLUMN structure_statuses.id IS 'Признак строения';
+COMMENT ON COLUMN structure_statuses.name      IS 'Наименование';
+COMMENT ON COLUMN structure_statuses.shortname IS 'Краткое наименование';
+
+-- 9
 CREATE TABLE IF NOT EXISTS estate_statuses (
-  id        SERIAL PRIMARY KEY,
-  eststatid INT,
+  id        INT PRIMARY KEY,
   name      VARCHAR,
   shortname VARCHAR
 );
-COMMENT ON TABLE estate_statuses            IS 'Признак владения';
-COMMENT ON COLUMN estate_statuses.eststatid IS 'Признак владения';
+COMMENT ON TABLE estate_statuses IS 'Признак владения';
+COMMENT ON COLUMN estate_statuses.id IS 'Признак владения';
 COMMENT ON COLUMN estate_statuses.name      IS 'Наименование';
 COMMENT ON COLUMN estate_statuses.shortname IS 'Краткое наименование';
--- 7
-CREATE TABLE IF NOT EXISTS house(
-  id         SERIAL PRIMARY KEY,
-  houseguid  VARCHAR,
-  eststatus  INT,
-  oktmo      VARCHAR,
-  statstatus INT,
-  ifnsul     VARCHAR,
-  okato      VARCHAR,
-  postalcode VARCHAR,
-  regioncode VARCHAR,
-  housenum   VARCHAR,
-  ifnsfl     VARCHAR,
-  updatedate VARCHAR,
-  terrifnsul VARCHAR,
-  counter    INT,
-  buildnum   VARCHAR,
-  strucnum   VARCHAR,
-  terrifnsfl VARCHAR,
-  houseid    VARCHAR,
-  enddate    VARCHAR,
-  strstatus  INT,
-  startdate  VARCHAR,
-  aoguid     VARCHAR,
-  normdoc    VARCHAR,
+
+
+-- 0
+CREATE TABLE IF NOT EXISTS houses(
+  id          VARCHAR PRIMARY KEY,
+  houseguid   VARCHAR,
+  eststatus   INT REFERENCES estate_statuses,
+  oktmo       VARCHAR,
+  statestatus INT REFERENCES house_state_statuses,
+  ifnsul      VARCHAR,
+  okato       VARCHAR,
+  postalcode  VARCHAR,
+  regioncode  VARCHAR,
+  housenum    VARCHAR,
+  ifnsfl      VARCHAR,
+  updatedate  DATE,
+  terrifnsul  VARCHAR,
+  counter     INT,
+  buildnum    VARCHAR,
+  strucnum    VARCHAR,
+  terrifnsfl  VARCHAR,
+  startdate   DATE,
+  enddate     DATE,
+  strstatus   INT REFERENCES structure_statuses,
+  aoguid      VARCHAR,
+  normdoc     VARCHAR REFERENCES normative_documents,
   -- последних двух полей нет ни у одного объекта из базы
   cadnum     VARCHAR,
-  dvitype    VARCHAR
+  divtype    VARCHAR
 );
-COMMENT ON TABLE house IS 'Сведения по номерам домов улиц городов и населенных пунктов';
-COMMENT ON COLUMN house.postalcode IS 'Почтовый индекс';
-COMMENT ON COLUMN house.regioncode IS 'Код региона';
-COMMENT ON COLUMN house.ifnsfl     IS 'Код ИФНС ФЛ';
-COMMENT ON COLUMN house.terrifnsfl IS 'Код территориального участка ИФНС ФЛ';
-COMMENT ON COLUMN house.ifnsul     IS 'Код ИФНС ЮЛ';
-COMMENT ON COLUMN house.terrifnsul IS 'Код территориального участка ИФНС ЮЛ';
-COMMENT ON COLUMN house.okato      IS 'ОКАТО';
-COMMENT ON COLUMN house.oktmo      IS 'ОКТМО';
-COMMENT ON COLUMN house.updatedate IS 'Дата время внесения записи';
-COMMENT ON COLUMN house.housenum   IS 'Номер дома';
-COMMENT ON COLUMN house.eststatus  IS 'Признак владения';
-COMMENT ON COLUMN house.buildnum   IS 'Номер корпуса';
-COMMENT ON COLUMN house.strucnum   IS 'Номер строения';
-COMMENT ON COLUMN house.strstatus  IS 'Признак строения';
-COMMENT ON COLUMN house.houseid    IS 'Уникальный идентификатор записи дома';
-COMMENT ON COLUMN house.houseguid  IS 'Глобальный уникальный идентификатор дома';
-COMMENT ON COLUMN house.aoguid     IS 'Guid записи родительского объекта (улицы, города, населенного пункта и т.п.)';
-COMMENT ON COLUMN house.startdate  IS 'Начало действия записи';
-COMMENT ON COLUMN house.statstatus IS 'Состояние дома';
-COMMENT ON COLUMN house.normdoc    IS 'Внешний ключ на нормативный документ';
-COMMENT ON COLUMN house.counter    IS 'Счетчик записей домов для КЛАДР 4';
-COMMENT ON COLUMN house.cadnum     IS 'Кадастровый номер';
-COMMENT ON COLUMN house.dvitype    IS 'Тип адресации:
-                                       0 - не определено
-                                       1 - муниципальный;
-                                       2 - административно-территориальный';
+COMMENT ON TABLE houses IS 'Сведения по номерам домов улиц городов и населенных пунктов';
+COMMENT ON COLUMN houses.postalcode  IS 'Почтовый индекс';
+COMMENT ON COLUMN houses.regioncode  IS 'Код региона';
+COMMENT ON COLUMN houses.ifnsfl      IS 'Код ИФНС ФЛ';
+COMMENT ON COLUMN houses.terrifnsfl  IS 'Код территориального участка ИФНС ФЛ';
+COMMENT ON COLUMN houses.ifnsul      IS 'Код ИФНС ЮЛ';
+COMMENT ON COLUMN houses.terrifnsul  IS 'Код территориального участка ИФНС ЮЛ';
+COMMENT ON COLUMN houses.okato       IS 'ОКАТО';
+COMMENT ON COLUMN houses.oktmo       IS 'ОКТМО';
+COMMENT ON COLUMN houses.updatedate  IS 'Дата время внесения записи';
+COMMENT ON COLUMN houses.housenum    IS 'Номер дома';
+COMMENT ON COLUMN houses.eststatus   IS 'Признак владения';
+COMMENT ON COLUMN houses.buildnum    IS 'Номер корпуса';
+COMMENT ON COLUMN houses.strucnum    IS 'Номер строения';
+COMMENT ON COLUMN houses.strstatus   IS 'Признак строения';
+COMMENT ON COLUMN houses.id          IS 'Уникальный идентификатор записи дома';
+COMMENT ON COLUMN houses.houseguid   IS 'Глобальный уникальный идентификатор дома';
+COMMENT ON COLUMN houses.aoguid      IS 'Guid записи родительского объекта (улицы, города, населенного пункта и т.п.)';
+COMMENT ON COLUMN houses.startdate   IS 'Начало действия записи';
+COMMENT ON COLUMN houses.statestatus IS 'Состояние дома';
+COMMENT ON COLUMN houses.normdoc     IS 'Внешний ключ на нормативный документ';
+COMMENT ON COLUMN houses.counter     IS 'Счетчик записей домов для КЛАДР 4';
+COMMENT ON COLUMN houses.cadnum      IS 'Кадастровый номер';
+COMMENT ON COLUMN houses.divtype     IS 'Тип адресации:
+                                        0 - не определено
+                                        1 - муниципальный;
+                                        2 - административно-территориальный';
 
--- 8
+-- 6
+CREATE TABLE IF NOT EXISTS interval_statuses(
+  id         INT PRIMARY KEY,
+  name       VARCHAR
+
+);
+COMMENT ON TABLE  interval_statuses      IS 'Статус интервала домов';
+COMMENT ON COLUMN interval_statuses.id   IS 'Идентификатор статуса (обычный, четный, нечетный)';
+COMMENT ON COLUMN interval_statuses.name IS 'Наименование';
+
+-- 0
 CREATE TABLE IF NOT EXISTS house_intervals(
-  id         SERIAL PRIMARY KEY,
+  id         VARCHAR PRIMARY KEY,
   intguid    VARCHAR,
   oktmo      VARCHAR,
   ifnsul     VARCHAR,
@@ -226,17 +293,16 @@ CREATE TABLE IF NOT EXISTS house_intervals(
   intstart   INT,
   intend     INT,
   postalcode VARCHAR,
-  enddate    VARCHAR,
+  enddate    DATE,
   ifnsfl     VARCHAR,
-  updatedate VARCHAR,
+  updatedate DATE,
   terrifnsul VARCHAR,
-  houseintid VARCHAR,
   terrifnsfl VARCHAR,
-  intstatus  INT,
+  intstatus  INT REFERENCES interval_statuses,
   counter    INT,
-  startdate  VARCHAR,
+  startdate  DATE,
   aoguid     VARCHAR,
-  normdoc    VARCHAR
+  normdoc    VARCHAR REFERENCES normative_documents
 );
 COMMENT ON TABLE house_intervals IS 'Интервалы домов';
 COMMENT ON COLUMN house_intervals.postalcode IS 'Почтовый индекс';
@@ -249,7 +315,7 @@ COMMENT ON COLUMN house_intervals.oktmo      IS 'ОКТМО';
 COMMENT ON COLUMN house_intervals.updatedate IS 'Дата внесения записи';
 COMMENT ON COLUMN house_intervals.intstart   IS 'Значение начала интервала';
 COMMENT ON COLUMN house_intervals.intend     IS 'Значение окончания интервала';
-COMMENT ON COLUMN house_intervals.houseintid IS 'Идентификатор записи интервала домов';
+COMMENT ON COLUMN house_intervals.id         IS 'Идентификатор записи интервала домов';
 COMMENT ON COLUMN house_intervals.intguid    IS 'Глобальный уникальный идентификатор интервала домов';
 COMMENT ON COLUMN house_intervals.aoguid     IS 'Идентификатор объекта родительского объекта (улицы, города, населенного пункта и т.п.)';
 COMMENT ON COLUMN house_intervals.startdate  IS 'Начало действия записи';
@@ -257,156 +323,57 @@ COMMENT ON COLUMN house_intervals.enddate    IS 'Окончание действ
 COMMENT ON COLUMN house_intervals.intstatus  IS 'Статус интервала (обычный, четный, нечетный)';
 COMMENT ON COLUMN house_intervals.normdoc    IS 'Внешний ключ на нормативный документ';
 COMMENT ON COLUMN house_intervals.counter    IS 'Счетчик записей домов для КЛАДР 4';
--- 9
-CREATE TABLE IF NOT EXISTS house_state_statuses(
-  id        SERIAL PRIMARY KEY,
-  housestid INT,
-  name      VARCHAR
-);
-COMMENT ON TABLE  house_state_statuses IS 'Статус состояния домов';
-COMMENT ON COLUMN house_state_statuses.housestid IS 'Идентификатор статуса';
-COMMENT ON COLUMN house_state_statuses.name      IS 'Наименование';
 
--- 10
-CREATE TABLE IF NOT EXISTS interval_statuses(
-  id         SERIAL PRIMARY KEY,
-  intvstatid INT,
-  name       VARCHAR
 
-);
-COMMENT ON TABLE  interval_statuses            IS 'Статус интервала домов';
-COMMENT ON COLUMN interval_statuses.intvstatid IS 'Идентификатор статуса (обычный, четный, нечетный)';
-COMMENT ON COLUMN interval_statuses.name       IS 'Наименование';
-
--- 11
-CREATE TABLE IF NOT EXISTS landmark(
-  id         SERIAL PRIMARY KEY,
+-- 0
+CREATE TABLE IF NOT EXISTS landmarks(
+  id         VARCHAR PRIMARY KEY,
   location   VARCHAR,
-  -- Этоих столбцов нет ни у одного объекта из XML
+  -- Этих столбцов нет ни у одного объекта из XML
   regioncode VARCHAR,
   cadnum     VARCHAR,
   -----------------------------------------------
   okato      VARCHAR,
   oktmo      VARCHAR,
-  enddate    VARCHAR,
+  enddate    DATE,
   ifnsfl     VARCHAR,
-  updatedate VARCHAR,
+  updatedate DATE,
   postalcode VARCHAR,
   terrifnsul VARCHAR,
   ifnsul     VARCHAR,
   terrifnsfl VARCHAR,
   landguid   VARCHAR,
-  startdate  VARCHAR,
+  startdate  DATE,
   aoguid     VARCHAR,
-  landid     VARCHAR,
-  normdoc    VARCHAR
+  normdoc    VARCHAR REFERENCES normative_documents
 );
-COMMENT ON TABLE landmark IS 'Описание мест расположения имущественных объектов';
-COMMENT ON COLUMN landmark.location     IS 'Месторасположение ориентира';
-COMMENT ON COLUMN landmark.regioncode   IS 'Месторасположение ориентира';
-COMMENT ON COLUMN landmark.postalcode   IS 'Почтовый индекс';
-COMMENT ON COLUMN landmark.ifnsfl       IS 'Код ИФНС ФЛ';
-COMMENT ON COLUMN landmark.terrifnsfl   IS 'Код территориального участка ИФНС ФЛ';
-COMMENT ON COLUMN landmark.ifnsul       IS 'Код ИФНС ЮЛ';
-COMMENT ON COLUMN landmark.terrifnsul   IS 'Код территориального участка ИФНС ЮЛ';
-COMMENT ON COLUMN landmark.okato        IS 'ОКАТО';
-COMMENT ON COLUMN landmark.oktmo        IS 'ОКТМО';
-COMMENT ON COLUMN landmark.updatedate   IS 'Дата внесения записи';
-COMMENT ON COLUMN landmark.landid       IS 'Уникальный идентификатор записи ориентира';
-COMMENT ON COLUMN landmark.landguid     IS 'Глобальный уникальный идентификатор ориентира';
-COMMENT ON COLUMN landmark.aoguid       IS 'Уникальный идентификатор родительского объекта (улицы, города, населенного пункта и т.п.)';
-COMMENT ON COLUMN landmark.startdate    IS 'Начало действия записи';
-COMMENT ON COLUMN landmark.enddate      IS 'Окончание действия записи';
-COMMENT ON COLUMN landmark.normdoc      IS 'Внешний ключ на нормативный документ';
-COMMENT ON COLUMN landmark.cadnum       IS 'Кадастровый номер';
--- 12
-CREATE TABLE IF NOT EXISTS normative_document(
-  id        SERIAL PRIMARY KEY,
-  docdate   VARCHAR,
-  normdocid VARCHAR,
-  docnum    VARCHAR,
-  doctype   INT,
-  docname   VARCHAR,
-  -- Поле не встречается ни у одного объекта
-  docimgid  INT
-);
-COMMENT ON TABLE normative_document IS 'Сведения по нормативному документу, являющемуся основанием присвоения адресному элементу наименования';
-COMMENT ON COLUMN normative_document.normdocid IS 'Идентификатор нормативного документа';
-COMMENT ON COLUMN normative_document.docname   IS 'Наименование документа';
-COMMENT ON COLUMN normative_document.docdate   IS 'Дата документа';
-COMMENT ON COLUMN normative_document.docnum    IS 'Номер документа';
-COMMENT ON COLUMN normative_document.doctype   IS 'Тип документа';
-COMMENT ON COLUMN normative_document.docimgid  IS 'Идентификатор образа (внешний ключ)';
--- 13
-CREATE TABLE IF NOT EXISTS normative_document_type(
-  id       SERIAL PRIMARY KEY,
-  ndtypeid INT,
-  name     VARCHAR
-);
-COMMENT ON TABLE normative_document_type IS 'Тип нормативного документа';
-COMMENT ON COLUMN normative_document_type.ndtypeid IS 'Идентификатор записи (ключ)';
-COMMENT ON COLUMN normative_document_type.name     IS 'Наименование типа нормативного документа';
+COMMENT ON TABLE landmarks IS 'Описание мест расположения имущественных объектов';
+COMMENT ON COLUMN landmarks.location   IS 'Месторасположение ориентира';
+COMMENT ON COLUMN landmarks.regioncode IS 'Месторасположение ориентира';
+COMMENT ON COLUMN landmarks.postalcode IS 'Почтовый индекс';
+COMMENT ON COLUMN landmarks.ifnsfl     IS 'Код ИФНС ФЛ';
+COMMENT ON COLUMN landmarks.terrifnsfl IS 'Код территориального участка ИФНС ФЛ';
+COMMENT ON COLUMN landmarks.ifnsul     IS 'Код ИФНС ЮЛ';
+COMMENT ON COLUMN landmarks.terrifnsul IS 'Код территориального участка ИФНС ЮЛ';
+COMMENT ON COLUMN landmarks.okato      IS 'ОКАТО';
+COMMENT ON COLUMN landmarks.oktmo      IS 'ОКТМО';
+COMMENT ON COLUMN landmarks.updatedate IS 'Дата внесения записи';
+COMMENT ON COLUMN landmarks.id         IS 'Уникальный идентификатор записи ориентира';
+COMMENT ON COLUMN landmarks.landguid   IS 'Глобальный уникальный идентификатор ориентира';
+COMMENT ON COLUMN landmarks.aoguid     IS 'Уникальный идентификатор родительского объекта (улицы, города, населенного пункта и т.п.)';
+COMMENT ON COLUMN landmarks.startdate  IS 'Начало действия записи';
+COMMENT ON COLUMN landmarks.enddate    IS 'Окончание действия записи';
+COMMENT ON COLUMN landmarks.normdoc    IS 'Внешний ключ на нормативный документ';
+COMMENT ON COLUMN landmarks.cadnum     IS 'Кадастровый номер';
 
--- 14
-CREATE TABLE IF NOT EXISTS operation_status(
-  id         SERIAL PRIMARY KEY,
-  operstatid INT,
-  name       VARCHAR
-);
-COMMENT ON TABLE operation_status IS 'Статус действия';
-COMMENT ON COLUMN operation_status.operstatid IS 'Идентификатор статуса (ключ)';
-COMMENT ON COLUMN operation_status.name       IS 'Наименование';
 
--- 15
-CREATE TABLE IF NOT EXISTS room(
-  id         SERIAL PRIMARY KEY,
-  houseguid  VARCHAR,
-  regioncode VARCHAR,
-  cadnum     VARCHAR,
-  roomguid   VARCHAR,
-  operstatus INT,
-  roomtype   VARCHAR,
-  postalcode VARCHAR,
-  flatnumber VARCHAR,
-  updatedate VARCHAR,
-  roomcadnum VARCHAR,
-  nextid     VARCHAR,
-  livestatus VARCHAR,
-  previd     VARCHAR,
-  roomnumber VARCHAR,
-  enddate    VARCHAR,
-  startdate  VARCHAR,
-  roomid     VARCHAR,
-  normdoc    VARCHAR,
-  flattype   VARCHAR
-);
-COMMENT ON TABLE room IS 'Классификатор помещений';
-COMMENT ON COLUMN room.roomid     IS 'Уникальный идентификатор записи. Ключевое поле.';
-COMMENT ON COLUMN room.roomguid   IS 'Глобальный уникальный идентификатор адресного объекта (помещения)';
-COMMENT ON COLUMN room.flatnumber IS 'Номер помещения или офиса';
-COMMENT ON COLUMN room.flattype   IS 'Тип помещения';
-COMMENT ON COLUMN room.roomnumber IS 'Номер комнаты';
-COMMENT ON COLUMN room.roomtype   IS 'Тип комнаты';
-COMMENT ON COLUMN room.regioncode IS 'Код региона';
-COMMENT ON COLUMN room.postalcode IS 'Почтовый индекс';
-COMMENT ON COLUMN room.houseguid  IS 'Дата внесения записи';
-COMMENT ON COLUMN room.houseguid  IS 'Дата внесения записи';
-COMMENT ON COLUMN room.previd     IS 'Идентификатор записи связывания с предыдущей исторической записью';
-COMMENT ON COLUMN room.nextid     IS 'Идентификатор записи связывания с последующей исторической записью';
-COMMENT ON COLUMN room.startdate  IS 'Начало действия записи';
-COMMENT ON COLUMN room.enddate    IS 'Окончание действия записи';
-COMMENT ON COLUMN room.livestatus IS 'Признак действующего адресного объекта';
-COMMENT ON COLUMN room.normdoc    IS 'Внешний ключ на нормативный документ';
-COMMENT ON COLUMN room.operstatus IS 'Статус действия над записью – причина появления записи (см. описание таблицы operation_status)';
-COMMENT ON COLUMN room.cadnum     IS 'Кадастровый номер помещения';
-COMMENT ON COLUMN room.roomcadnum IS 'Кадастровый номер комнаты в помещении';
--- 16
+-- 0
 CREATE TABLE IF NOT EXISTS stead(
-  id         SERIAL PRIMARY KEY,
+  id         VARCHAR PRIMARY KEY,
   regioncode VARCHAR,
   oktmo      VARCHAR,
   ifnsul     VARCHAR,
-  updatedate VARCHAR,
+  updatedate DATE,
   ifnsfl     VARCHAR,
   number     VARCHAR,
   nextid     VARCHAR,
@@ -414,20 +381,19 @@ CREATE TABLE IF NOT EXISTS stead(
   divtype    VARCHAR,
   parentguid VARCHAR,
   terrifnsfl VARCHAR,
-  steadid    VARCHAR,
-  enddate    VARCHAR,
+  enddate    DATE,
   cadnum     VARCHAR,
-  normdoc    VARCHAR,
+  normdoc    VARCHAR REFERENCES normative_documents,
   okato      VARCHAR,
-  operstatus INT,
+  operstatus INT REFERENCES operation_statuses,
   postalcode VARCHAR,
   terrifnsul VARCHAR,
   steadguid  VARCHAR,
   previd     VARCHAR,
-  startdate  VARCHAR
+  startdate  DATE
 );
 COMMENT ON TABLE stead IS 'Классификатор земельных участков';
-COMMENT ON COLUMN stead.steadid    IS 'Уникальный идентификатор записи. Ключевое поле.';
+COMMENT ON COLUMN stead.id         IS 'Уникальный идентификатор записи. Ключевое поле.';
 COMMENT ON COLUMN stead.steadguid  IS 'Глобальный уникальный идентификатор адресного объекта (земельного участка)';
 COMMENT ON COLUMN stead.number     IS 'Номер земельного участка';
 COMMENT ON COLUMN stead.regioncode IS 'Код региона';
@@ -453,14 +419,45 @@ COMMENT ON COLUMN stead.divtype    IS 'Тип адресации:
                                        1 - муниципальный;
                                        2 - административно-территориальный';
 
--- 17
-CREATE TABLE IF NOT EXISTS structure_status(
-  id        SERIAL PRIMARY KEY,
-  shortname VARCHAR,
-  strstatid INT,
-  name      VARCHAR
+-- 0
+CREATE TABLE IF NOT EXISTS rooms(
+  id         VARCHAR PRIMARY KEY,
+  houseguid  VARCHAR,
+  regioncode VARCHAR,
+  cadnum     VARCHAR,
+  roomguid   VARCHAR,
+  operstatus INT REFERENCES operation_statuses,
+  roomtype   VARCHAR,
+  postalcode VARCHAR,
+  flatnumber VARCHAR,
+  updatedate DATE,
+  roomcadnum VARCHAR,
+  nextid     VARCHAR,
+  livestatus VARCHAR,
+  previd     VARCHAR,
+  roomnumber VARCHAR,
+  enddate    DATE,
+  startdate  DATE,
+  normdoc    VARCHAR REFERENCES normative_documents,
+  flattype   VARCHAR
 );
-COMMENT ON TABLE structure_status IS 'Признак строения';
-COMMENT ON COLUMN structure_status.strstatid IS 'Признак строения';
-COMMENT ON COLUMN structure_status.name      IS 'Наименование';
-COMMENT ON COLUMN structure_status.shortname IS 'Краткое наименование';
+COMMENT ON TABLE rooms IS 'Классификатор помещений';
+COMMENT ON COLUMN rooms.id     IS 'Уникальный идентификатор записи. Ключевое поле.';
+COMMENT ON COLUMN rooms.roomguid   IS 'Глобальный уникальный идентификатор адресного объекта (помещения)';
+COMMENT ON COLUMN rooms.flatnumber IS 'Номер помещения или офиса';
+COMMENT ON COLUMN rooms.flattype   IS 'Тип помещения';
+COMMENT ON COLUMN rooms.roomnumber IS 'Номер комнаты';
+COMMENT ON COLUMN rooms.roomtype   IS 'Тип комнаты';
+COMMENT ON COLUMN rooms.regioncode IS 'Код региона';
+COMMENT ON COLUMN rooms.postalcode IS 'Почтовый индекс';
+COMMENT ON COLUMN rooms.houseguid  IS 'Дата внесения записи';
+COMMENT ON COLUMN rooms.houseguid  IS 'Дата внесения записи';
+COMMENT ON COLUMN rooms.previd     IS 'Идентификатор записи связывания с предыдущей исторической записью';
+COMMENT ON COLUMN rooms.nextid     IS 'Идентификатор записи связывания с последующей исторической записью';
+COMMENT ON COLUMN rooms.startdate  IS 'Начало действия записи';
+COMMENT ON COLUMN rooms.enddate    IS 'Окончание действия записи';
+COMMENT ON COLUMN rooms.livestatus IS 'Признак действующего адресного объекта';
+COMMENT ON COLUMN rooms.normdoc    IS 'Внешний ключ на нормативный документ';
+COMMENT ON COLUMN rooms.operstatus IS 'Статус действия над записью – причина появления записи (см. описание таблицы operation_status)';
+COMMENT ON COLUMN rooms.cadnum     IS 'Кадастровый номер помещения';
+COMMENT ON COLUMN rooms.roomcadnum IS 'Кадастровый номер комнаты в помещении';

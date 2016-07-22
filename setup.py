@@ -15,7 +15,8 @@ from setuptools import setup, find_packages
 requires = [
     'psycopg2',
     'wget',
-    'requests'
+    'requests',
+    'rarfile'
 ]
 setup(name='fias_tools',
       version='0.1',

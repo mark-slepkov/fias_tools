@@ -3,13 +3,21 @@ import xml.parsers.expat
 import sys
 from helpers import get_filename_by_basename
 import os
-
+import rarfile
+import fnmatch
 class Parser(object):
     file_mask = None
 
-    def __init__(self, db_connection=None):
+    def __init__(self, db_connection=None, archive=None):
         file_mask = self.file_mask
-        self.xml_file = get_filename_by_basename(os.getcwd() +'/base_xml/', file_mask, fullpath=True)
+        if not archive:
+            self.xml_file = open(get_filename_by_basename(os.getcwd() +'/base_xml/', file_mask, fullpath=True), 'rb')
+        else:
+            rf = rarfile.RarFile(archive)
+            for file in rf.infolist():
+                if fnmatch.fnmatch(file.filename.lower(), ('as_'+file_mask+'*.xml').lower()):
+                    filename = file.filename
+                    self.xml_file = rf.open(filename)
         self.db_connection = db_connection
         self.table_columns = {}
         self.cache_counter = 0
@@ -30,7 +38,7 @@ class Parser(object):
     def parse(self):
         self.parser.StartElementHandler = self.handle_start_element
         try:
-            self.parser.ParseFile(open(self.xml_file, "rb"))
+            self.parser.ParseFile(self.xml_file)
         except Exception as e:
             print("ERROR: Can't open XML file!")
             print(str(e))
@@ -53,7 +61,7 @@ class Parser(object):
         """
         self.parser.StartElementHandler = self.count_attributes
         try:
-            self.parser.ParseFile(open(self.xml_file, "rb"))
+            self.parser.ParseFile(self.xml_file)
         except Exception as e:
             print("ERROR: Can't open XML file!")
             print(str(e))
