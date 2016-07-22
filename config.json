@@ -1,7 +1,7 @@
 {
   "base_source": "fias_xml.rar",
   "pg_database": {
-    "db_name": "maksreal",
+    "db_name": "fias",
     "host": "localhost",
     "port": 5432,
     "login": "username",
