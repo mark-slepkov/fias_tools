@@ -11,7 +11,7 @@ def update_download(force=False):
         print('do something')
         last_download.write(actual_date)
 
-def actual_base_download(url):
+def actual_base_download(url='http://fias.nalog.ru/Public/Downloads/Actual/fias_xml.rar'):
     r = requests.get('http://fias.nalog.ru/Public/Downloads/Actual/VerDate.txt')
     actual_date = r.content.decode()
     wget.download(url)

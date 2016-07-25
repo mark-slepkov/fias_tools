@@ -85,3 +85,4 @@ class Room(Parser):
                 self.db_connection.commit()
                 sys.stdout.write('  ' + str(self.cache_counter) + ' records complete \r')
             self.cache_counter += 1
+            self.records_counter += 1

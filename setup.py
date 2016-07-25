@@ -16,7 +16,16 @@ requires = [
     'psycopg2',
     'wget',
     'requests',
-    'rarfile'
+    'rarfile',
+    'tornado',
+    'observer',
+    'python-daemon-3K',
+
+]
+dependency_links = [
+    'git+https://github.com/mark-slepkov/python-observer.git#egg=observer',
+    'git+https://github.com/mark-slepkov/python-daemon.git#egg=python-daemon-3K',
+
 ]
 setup(name='fias_tools',
       version='0.1',
@@ -35,5 +44,5 @@ setup(name='fias_tools',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      # dependency_links=dependency_links,
+      dependency_links=dependency_links,
       )

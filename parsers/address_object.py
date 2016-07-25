@@ -131,6 +131,7 @@ class AddressObject(Parser):
                     %(TERRIFNSUL)s
                 )
             """,attributes)
+            self.records_counter += 1
         if self.cache_counter % 100 == 0:
             self.db_connection.commit()
             sys.stdout.write(str(self.cache_counter) + ' records complete \r')

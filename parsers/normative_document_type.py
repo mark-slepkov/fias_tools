@@ -26,3 +26,4 @@ class NormativeDocumentType(Parser):
                   %(NAME)s
                 )
             """, attributes)
+            self.records_counter += 1

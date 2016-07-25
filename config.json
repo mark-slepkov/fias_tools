@@ -1,10 +1,13 @@
 {
   "base_source": "fias_xml.rar",
   "pg_database": {
-    "db_name": "maksreal",
+    "db_name": "fias_test",
     "host": "db.maksreal.com",
     "port": 5432,
     "login": "maksreal",
     "password": "c6428fee7c"
+  },
+  "web_server": {
+    "port": 8088
   }
 }
