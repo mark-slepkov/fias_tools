@@ -40,12 +40,12 @@ class State(tornado.web.RequestHandler):
 
     def get(self, *args, **kwargs):
         try:
-            print(state)
+            # print(state)
             self.write('<pre>')
             self.write(json.dumps(state, indent=4, sort_keys=True))
             self.write('<pre>')
         except Exception as e:
-            print(str(e))
+            pass
 
 
 class ServerApp(object):
