@@ -51,7 +51,6 @@ class AddressObject(Parser):
             return
         attributes = self.table_prototype()
         attributes.update(attrs)
-
         with self.db_connection.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO address_objects (
@@ -130,26 +129,6 @@ class AddressObject(Parser):
                     %(OKATO)s,
                     %(TERRIFNSUL)s
                 )
-            """,attributes)
-            self.records_counter += 1
-        if self.cache_counter % 100 == 0:
-            self.db_connection.commit()
-            sys.stdout.write(str(self.cache_counter) + ' records complete \r')
-        self.cache_counter += 1
-
-        # input('Press Enter:')
-
-
-
-    def handle_char_data(self, data):
-        # print('Handle char data: '+str(data))
-        pass
-
-    def handle_end_element(self, name):
-        # print('Handle end element: '+str(name))
-        # print('#########################################')
-        pass
-
-
+            """, attributes)
 
 

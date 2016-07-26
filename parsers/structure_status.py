@@ -1,5 +1,7 @@
 __author__ = 'mark'
 from .base import Parser
+
+
 class StructureStatus(Parser):
     file_mask = 'strstat'
 
@@ -12,9 +14,6 @@ class StructureStatus(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        print('Handle start element: '+ str(name))
-        print(str(attrs))
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -29,4 +28,3 @@ class StructureStatus(Parser):
                   %(NAME)s
                 )
             """, attributes)
-            self.records_counter += 1

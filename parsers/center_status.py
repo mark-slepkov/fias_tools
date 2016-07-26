@@ -13,9 +13,6 @@ class CenterStatus(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        print('Handle start element: '+ str(name))
-        print(attrs)
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -29,4 +26,3 @@ class CenterStatus(Parser):
                   %(NAME)s
                 )
             """, attributes)
-            self.records_counter += 1

@@ -11,9 +11,6 @@ class IntervalStatus(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        print('Handle start element: '+ str(name))
-        print(str(attrs))
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -27,4 +24,3 @@ class IntervalStatus(Parser):
                   %(NAME)s
                 )
             """, attributes)
-            self.records_counter += 1

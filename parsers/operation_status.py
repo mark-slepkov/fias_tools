@@ -11,8 +11,6 @@ class OperationStatus(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        # print('Handle start element: '+ str(name))
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -26,4 +24,3 @@ class OperationStatus(Parser):
                   %(NAME)s
                 )
             """, attributes)
-            self.records_counter += 1

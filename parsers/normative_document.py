@@ -35,8 +35,3 @@ class NormativeDocument(Parser):
                   %(DOCIMGID)s
                 )
             """, attributes)
-        if self.cache_counter % 100 == 0:
-            self.db_connection.commit()
-            sys.stdout.write(str(self.cache_counter) + ' records complete \r')
-        self.cache_counter += 1
-        self.records_counter += 1

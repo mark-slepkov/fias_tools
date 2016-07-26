@@ -2,6 +2,7 @@ __author__ = 'mark'
 
 from .base import Parser
 
+
 class ActualStatus(Parser):
     file_mask = 'actstat'
     @staticmethod
@@ -12,8 +13,6 @@ class ActualStatus(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        # print('Handle start element: '+ str(name))
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -27,7 +26,6 @@ class ActualStatus(Parser):
                   %(NAME)s
                 )
             """, attributes)
-            self.records_counter += 1
 
 
 

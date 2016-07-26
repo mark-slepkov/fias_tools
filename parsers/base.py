@@ -40,14 +40,18 @@ class Parser(object):
         return response
 
     def handle_char_data(self, data):
-        pass
+        return True
 
     def wrapper_start_element(self, name, attrs):
-        response = self.handle_start_element(name, attrs)
-
-        self.trigger('start_element:handled', self)
-
-        return response
+        try:
+            response = self.handle_start_element(name, attrs)
+            self.records_counter += 1
+            if (self.records_counter % 1000) == 0:
+                self.db_connection.commit()
+            self.trigger('start_element:handled', self)
+            return response
+        except Exception as e:
+            print('Exception: ' + str(e))
 
     def handle_start_element(self, name, attrs):
         pass

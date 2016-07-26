@@ -32,9 +32,6 @@ class Stead(Parser):
         }
 
     def handle_start_element(self, name, attrs, *args, **kwargs):
-        # print('#########################################')
-        print('Handle start element: '+ str(name))
-        print(str(attrs))
         if attrs == {}:
             return
         attributes = self.table_prototype()
@@ -90,8 +87,3 @@ class Stead(Parser):
                     %(STARTDATE)s
                 )
             """, attributes)
-            if self.cache_counter % 100 == 0:
-                self.db_connection.commit()
-                sys.stdout.write('  ' + str(self.cache_counter) + ' records complete \r')
-            self.cache_counter += 1
-            self.records_counter += 1
