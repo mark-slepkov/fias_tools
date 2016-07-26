@@ -32,7 +32,6 @@ from parsers import (
 state = {'download': None, 'install': {}}
 current_parser = None
 config = Config()
-print(config)
 pg_conf = config['pg_database']
 from scheme import create_scheme
 

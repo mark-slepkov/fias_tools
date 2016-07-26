@@ -18,7 +18,6 @@ if __name__ == '__main__':
                       help="automatic installing downloaded FIAS base after launching the server", action="store_true", default=False)
     (options, args) = parser.parse_args()
     port = options.port
-    print(options)
     current_folder = os.getcwd()
     app = ServerApp(port, {
         'download': options.download,
