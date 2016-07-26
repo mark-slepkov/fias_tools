@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS address_objects (
   aolevel    INT,
   operstatus INT REFERENCES operation_statuses,
   citycode   VARCHAR,
-  normdoc    VARCHAR REFERENCES normative_documents,
+  normdoc    VARCHAR,  -- REFERENCES normative_documents
   actstatus  INT REFERENCES actual_statuses,
   ifnsfl     VARCHAR,
   livestatus VARCHAR,

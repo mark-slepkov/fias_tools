@@ -51,6 +51,8 @@ class Parser(object):
             self.trigger('start_element:handled', self)
             return response
         except Exception as e:
+            with self.db_connection.cursor() as cursor:
+                cursor.execute("ROLLBACK;")
             print('Exception: ' + str(e))
 
     def handle_start_element(self, name, attrs):
