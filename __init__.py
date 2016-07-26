@@ -9,7 +9,7 @@ from server import ServerApp
 if __name__ == '__main__':
     parser = OptionParser()
     config = Config()
-    config.load_config()
+    # config.load_config()
     parser.add_option("-p", "--port", dest="port",
                       help="connection port", metavar="PORT", default=config['port'])
     parser.add_option("-d", "--download", dest="download",
