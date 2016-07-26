@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 __author__ = 'mark'
 
+
 def create_scheme(db_connection, sql_file='scheme.sql'):
     file = open(sql_file, 'r')
     sql = file.read()

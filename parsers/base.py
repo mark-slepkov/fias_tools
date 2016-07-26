@@ -43,7 +43,6 @@ class Parser(object):
         pass
 
     def wrapper_start_element(self, name, attrs):
-        print('start_element')
         response = self.handle_start_element(name, attrs)
 
         self.trigger('start_element:handled', self)

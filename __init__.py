@@ -11,7 +11,7 @@ if __name__ == '__main__':
     config = Config()
     config.load_config()
     parser.add_option("-p", "--port", dest="port",
-                      help="connection port", metavar="PORT", default=config['web_server']['port'])
+                      help="connection port", metavar="PORT", default=config['port'])
     parser.add_option("-d", "--download", dest="download",
                       help="automatic downloading FIAS base after launching the server", action="store_true", default=False)
     parser.add_option("-i", "--install", dest="install",

@@ -7,7 +7,6 @@ from API.address_objects import AddressObjects
 import threading
 import json
 import download
-import install
 import psycopg2
 from datetime import datetime
 from psycopg2.extras import DictCursor
@@ -34,6 +33,7 @@ state = {'download': None, 'install': {}}
 current_parser = None
 config = Config()
 pg_conf = config['pg_database']
+from scheme import create_scheme
 
 
 class State(tornado.web.RequestHandler):
@@ -46,6 +46,7 @@ class State(tornado.web.RequestHandler):
             self.write('<pre>')
         except Exception as e:
             print(str(e))
+
 
 class ServerApp(object):
 
@@ -73,7 +74,7 @@ class ServerApp(object):
                         (r'/REST/_address_objects', AddressObjects),
                         (r'/REST/_state', State),
                     )
-        self.coroutine = threading.Thread(target=self.addition_tasks)
+        self.coroutine = AdditionTasks(options=self.options.copy())
         self.coroutine.start()
         application = tornado.web.Application(handlers)
         application.listen(self.port, '0.0.0.0')
@@ -85,17 +86,25 @@ class ServerApp(object):
         self.coroutine.stop()
         self.io_loop.stop()
 
-    def addition_tasks(self):
+
+class AdditionTasks(threading.Thread):
+
+    def __init__(self, options=None, **kwargs):
+        super().__init__(**kwargs)
+        self.options = options
+
+    def run(self):
+
         if self.options['download']:
             self.download_base()
         if self.options['install']:
             self.install_base()
 
-    def download_base(self):
+    @staticmethod
+    def download_base():
         state['download'] = 'started'
         download.actual_base_download()
         state['download'] = 'complete'
-
 
     def install_base(self):
         db_conn = psycopg2.connect(
@@ -106,6 +115,7 @@ class ServerApp(object):
             database=pg_conf['db_name'],
             cursor_factory=DictCursor
         )
+        create_scheme(db_conn, self.options['current_folder']+'/scheme/scheme.sql')
         parsers = [
             AddressObjectType,
             CenterStatus,
@@ -139,19 +149,20 @@ class ServerApp(object):
                 obj_parser.parse()
             except Exception as e:
                 state['install'][parser.__name__].update({
-                'status': 'failed',
-                'reason': str(e),
-                'stopped_at': str(datetime.now()),
-                'records_added': obj_parser.records_counter
-            })
-            self.db_conn.commit()
+                        'status': 'failed',
+                        'reason': str(e),
+                        'stopped_at': str(datetime.now()),
+                        'records_added': obj_parser.records_counter
+                    })
+            db_conn.commit()
             state['install'][parser.__name__].update({
                 'status': 'complete',
                 'stopped_at': str(datetime.now()),
                 'records_added': obj_parser.records_counter
             })
 
+
 def change_state(parser):
     state['install'][parser.__class__.__name__].update({
-            'records_added': parser.records_counter
+        'records_added': parser.records_counter
     })
