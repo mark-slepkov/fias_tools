@@ -3,7 +3,7 @@ import tornado.web
 import tornado.ioloop
 import signal
 from config import Config
-from API.address_objects import AddressObjects
+from API.address_objects import ViewAddressObjects
 import threading
 import json
 import download
@@ -59,7 +59,18 @@ class ServerApp(object):
         self.pidfile_path = '/tmp/fias_tools.pid'
         self.pidfile_timeout = 5
         self.io_loop = None
-        self.db_conn = psycopg2.connect(
+        # self.db_conn = psycopg2.connect(
+        #     host=pg_conf['host'],
+        #     port=pg_conf['port'],
+        #     user=pg_conf['login'],
+        #     password=pg_conf['password'],
+        #     database=pg_conf['db_name'],
+        #     cursor_factory=DictCursor
+        # )
+        self.coroutine = None
+
+    def run(self):
+        db_conn = psycopg2.connect(
             host=pg_conf['host'],
             port=pg_conf['port'],
             user=pg_conf['login'],
@@ -67,16 +78,13 @@ class ServerApp(object):
             database=pg_conf['db_name'],
             cursor_factory=DictCursor
         )
-        self.coroutine = None
-
-    def run(self):
         handlers = (
-                        (r'/REST/_address_objects', AddressObjects),
+                        (r'/REST/_address_objects', ViewAddressObjects, {'db_connection': db_conn}),
                         (r'/REST/_state', State),
                     )
         self.coroutine = AdditionTasks(options=self.options.copy())
         self.coroutine.start()
-        application = tornado.web.Application(handlers)
+        application = tornado.web.Application(handlers, autoreload=True)
         application.listen(self.port, '0.0.0.0')
         signal.signal(signal.SIGTERM, self.stop)
         self.io_loop = tornado.ioloop.IOLoop.instance()

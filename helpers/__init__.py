@@ -1,6 +1,8 @@
 __author__ = 'mark'
 import fnmatch
 import os
+
+
 def singleton(cls):
     instances = {}
 
@@ -11,6 +13,7 @@ def singleton(cls):
 
     return get_instance
 
+
 def get_filename_by_basename(directory: str, basename: str, fullpath: bool=False)->str:
     for file in os.listdir(directory):
         if fnmatch.fnmatch(file.lower(), ('as_'+basename+'*.xml').lower()):
@@ -18,3 +21,7 @@ def get_filename_by_basename(directory: str, basename: str, fullpath: bool=False
                 return directory + file
             else:
                 return file
+
+
+def date_serializer_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
