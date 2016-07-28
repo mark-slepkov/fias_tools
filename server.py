@@ -79,8 +79,8 @@ class ServerApp(object):
             cursor_factory=DictCursor
         )
         handlers = (
-                        (r'/REST/_address_objects', ViewAddressObjects, {'db_connection': db_conn}),
-                        (r'/REST/_state', State),
+                        (r'/FIAS/REST/_address_objects', ViewAddressObjects, {'db_connection': db_conn}),
+                        (r'/FIAS/REST/_state', State),
                     )
         self.coroutine = AdditionTasks(options=self.options.copy())
         self.coroutine.start()
