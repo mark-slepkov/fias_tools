@@ -18,7 +18,7 @@ requires = [
     'requests',
     'rarfile',
     'tornado',
-    'observer',
+    'observer=1.0',
     'python-daemon-3K',
 
 ]
