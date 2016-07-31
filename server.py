@@ -125,23 +125,24 @@ class AdditionTasks(threading.Thread):
         )
         create_scheme(db_conn, self.options['current_folder']+'/scheme/scheme.sql')
         parsers = [
-            # AddressObjectType,
-            # CenterStatus,
-            # CurrentStatus,
-            # OperationStatus,
-            # ActualStatus,
-            # IntervalStatus,
-            # StructureStatus,
-            # HouseStateStatus,
-            # EstateStatus,
-            # NormativeDocumentType,
-            # NormativeDocument,
+            AddressObjectType,
+            CenterStatus,
+            CurrentStatus,
+            OperationStatus,
+            ActualStatus,
+            IntervalStatus,
+            StructureStatus,
+            HouseStateStatus,
+            EstateStatus,
+            NormativeDocumentType,
+            NormativeDocument,
             AddressObject,
+            HouseInterval,
+            House,
             Room,
             Stead,
             Landmark,
-            HouseInterval,
-            House
+
         ]
 
         for parser in parsers:
