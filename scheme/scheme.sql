@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS houses(
   enddate     DATE,
   strstatus   INT REFERENCES structure_statuses,
   aoguid      VARCHAR,
-  normdoc     VARCHAR REFERENCES normative_documents,
+  normdoc     VARCHAR, -- REFERENCES normative_documents,
   -- последних двух полей нет ни у одного объекта из базы
   cadnum     VARCHAR,
   divtype    VARCHAR
@@ -302,7 +302,7 @@ CREATE TABLE IF NOT EXISTS house_intervals(
   counter    INT,
   startdate  DATE,
   aoguid     VARCHAR,
-  normdoc    VARCHAR REFERENCES normative_documents
+  normdoc    VARCHAR -- REFERENCES normative_documents
 );
 COMMENT ON TABLE house_intervals IS 'Интервалы домов';
 COMMENT ON COLUMN house_intervals.postalcode IS 'Почтовый индекс';
@@ -345,7 +345,7 @@ CREATE TABLE IF NOT EXISTS landmarks(
   landguid   VARCHAR,
   startdate  DATE,
   aoguid     VARCHAR,
-  normdoc    VARCHAR REFERENCES normative_documents
+  normdoc    VARCHAR -- REFERENCES normative_documents
 );
 COMMENT ON TABLE landmarks IS 'Описание мест расположения имущественных объектов';
 COMMENT ON COLUMN landmarks.location   IS 'Месторасположение ориентира';
@@ -383,7 +383,7 @@ CREATE TABLE IF NOT EXISTS stead(
   terrifnsfl VARCHAR,
   enddate    DATE,
   cadnum     VARCHAR,
-  normdoc    VARCHAR REFERENCES normative_documents,
+  normdoc    VARCHAR, -- REFERENCES normative_documents,
   okato      VARCHAR,
   operstatus INT REFERENCES operation_statuses,
   postalcode VARCHAR,
@@ -438,7 +438,7 @@ CREATE TABLE IF NOT EXISTS rooms(
   roomnumber VARCHAR,
   enddate    DATE,
   startdate  DATE,
-  normdoc    VARCHAR REFERENCES normative_documents,
+  normdoc    VARCHAR, -- REFERENCES normative_documents,
   flattype   VARCHAR
 );
 COMMENT ON TABLE rooms IS 'Классификатор помещений';
