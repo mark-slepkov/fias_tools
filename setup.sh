@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-apt-get install wget unrar
+apt-get install wget unrar libpq-dev
