@@ -77,6 +77,6 @@ class Room(Parser):
                     %(ENDDATE)s,
                     %(STARTDATE)s,
                     %(NORMDOC)s,
-                    %(FLATTYPE)s,
+                    %(FLATTYPE)s
                 )
             """, attributes)
