@@ -36,7 +36,7 @@ class Room(Parser):
         attributes.update(attrs)
 
         with self.db_connection.cursor() as cursor:
-            log(str(attributes))
+            # log(str(attributes))
             cursor.execute("""
                 INSERT INTO rooms (
                     id,
