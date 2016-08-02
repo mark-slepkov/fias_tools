@@ -1,6 +1,7 @@
 __author__ = 'mark'
 from .base import Parser
 import sys
+from helpers import log
 class Room(Parser):
     file_mask = 'room'
 
@@ -35,6 +36,7 @@ class Room(Parser):
         attributes.update(attrs)
 
         with self.db_connection.cursor() as cursor:
+            log(str(attributes))
             cursor.execute("""
                 INSERT INTO rooms (
                     id,
