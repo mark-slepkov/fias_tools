@@ -139,9 +139,9 @@ class AdditionTasks(threading.Thread):
             #AddressObject,
             #House,
             #HouseInterval,
-            Room,
-            #Stead,
-            #Landmark,
+            # Room,
+            Stead,
+            Landmark,
 
         ]
 
