@@ -184,6 +184,9 @@ COMMENT ON COLUMN address_objects.divtype    IS 'Тип адресации:
                                                  0 - не определено
                                                  1 - муниципальный;
                                                  2 - административно-территориальный';
+CREATE INDEX CONCURRENTLY index_address_objects_aoguid ON address_objects (aoguid);
+CREATE INDEX CONCURRENTLY index_address_objects_parentguid ON address_objects (parentguid);
+CREATE INDEX CONCURRENTLY index_address_objects_actstatus ON address_objects (actstatus);
 
 -- 5
 CREATE TABLE IF NOT EXISTS house_state_statuses(
