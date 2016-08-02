@@ -2,7 +2,7 @@
   "port": 8088,
   "base_source": "fias_xml.rar",
   "pg_database": {
-    "db_name": "fias_test",
+    "db_name": "fias",
     "host": "db.maksreal.com",
     "port": 5432,
     "login": "maksreal",

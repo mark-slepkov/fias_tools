@@ -276,6 +276,7 @@ COMMENT ON COLUMN houses.divtype     IS 'Тип адресации:
                                         1 - муниципальный;
                                         2 - административно-территориальный';
 
+CREATE INDEX index_houses_aoguid ON houses (aoguid);
 -- 6
 CREATE TABLE IF NOT EXISTS interval_statuses(
   id         INT PRIMARY KEY,
