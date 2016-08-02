@@ -17,13 +17,9 @@ class ViewAddressObjects(RequestHandler):
             # self.write(str(args))
             # self.write(str(kwargs))
             parentguid = self.get_query_argument('parentguid', default=None)
-            parent_type = self.get_query_argument('parent_type', default=None)
             level = self.get_query_argument('level', default=None)
             address_objects = AddressObjects(self.db_connection)
-            if parent_type == 'house':
-                items = address_objects.fetch_flats(parentguid).data
-            else:
-                items = address_objects.fetch(parentguid, level).data
+            items = address_objects.fetch(parentguid, level).data
             result = json.dumps(
                 {'items': items},
                 default=date_serializer_handler,

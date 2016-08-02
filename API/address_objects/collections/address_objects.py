@@ -46,7 +46,7 @@ class AddressObjects(object):
     def fetch_houses(self, aoguid):
         with self.db_connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, houseguid as aoguid, housenum
+                SELECT id, houseguid as aoguid, housenum, buildnum
                 FROM houses
                 WHERE (aoguid = %(aoguid)s)
             """, {
@@ -56,21 +56,5 @@ class AddressObjects(object):
             for item in result:
                 dict_item = dict(item)
                 dict_item['type'] = 'house'
-                self.data.append(dict_item)
-        return self
-
-    def fetch_flats(self, houseguid):
-        with self.db_connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT id, houseguid, flatnumber, flattype
-                FROM rooms
-                WHERE (houseguid = %(houseguid)s)
-            """, {
-                'houseguid': houseguid
-            })
-            result = cursor.fetchall()
-            for item in result:
-                dict_item = dict(item)
-                dict_item['type'] = 'flat'
                 self.data.append(dict_item)
         return self
