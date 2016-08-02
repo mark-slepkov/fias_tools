@@ -7,6 +7,7 @@ import rarfile
 import fnmatch
 
 from observer import observer
+from helpers import log
 
 
 @observer
@@ -53,7 +54,7 @@ class Parser(object):
         except Exception as e:
             with self.db_connection.cursor() as cursor:
                 cursor.execute("ROLLBACK;")
-            print('Exception: ' + str(e))
+            log('Exception: ' + str(e))
 
     def handle_start_element(self, name, attrs):
         pass
@@ -69,11 +70,11 @@ class Parser(object):
     def parse(self):
         self.parser.StartElementHandler = self.wrapper_start_element
         try:
-            print(self.xml_file)
+            log('Starting parser for ' + self.__class__.__name__)
             self.parser.ParseFile(self.xml_file)
         except Exception as e:
-            print("ERROR: Can't open XML file!")
-            print(str(e))
+            log("ERROR: Can't open XML file!")
+            log(str(e))
 
     def count_attributes(self, name, attrs):
 
@@ -93,5 +94,5 @@ class Parser(object):
         try:
             self.parser.ParseFile(self.xml_file)
         except Exception as e:
-            print("ERROR: Can't open XML file!")
-            print(str(e))
+            log("ERROR: Can't open XML file!")
+            log(str(e))

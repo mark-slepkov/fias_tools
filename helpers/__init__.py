@@ -1,7 +1,7 @@
 __author__ = 'mark'
 import fnmatch
 import os
-
+from datetime import datetime
 
 def singleton(cls):
     instances = {}
@@ -25,3 +25,7 @@ def get_filename_by_basename(directory: str, basename: str, fullpath: bool=False
 
 def date_serializer_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+
+
+def log(s: str):
+    print(str(datetime.now()) + ': ' + s)
