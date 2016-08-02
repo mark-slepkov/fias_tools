@@ -36,7 +36,9 @@ class AddressObjects(object):
                 })
             result = cursor.fetchall()
             for item in result:
-                self.data.append(dict(item))
+                dict_item = dict(item)
+                dict_item['type'] = 'location'
+                self.data.append(dict_item)
         if len(result) == 0:
             return self.fetch_houses(parentguid)
         return self
@@ -44,7 +46,7 @@ class AddressObjects(object):
     def fetch_houses(self, aoguid):
         with self.db_connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, houseguid, aoguid, housenum as formalname
+                SELECT id, houseguid, aoguid, housenum
                 FROM houses
                 WHERE (aoguid = %(aoguid)s)
             """, {
@@ -52,5 +54,7 @@ class AddressObjects(object):
             })
             result = cursor.fetchall()
             for item in result:
-                self.data.append(dict(item))
+                dict_item = dict(item)
+                dict_item['type'] = 'house'
+                self.data.append(dict_item)
         return self
