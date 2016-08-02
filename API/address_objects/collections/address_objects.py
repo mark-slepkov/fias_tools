@@ -24,7 +24,7 @@ class AddressObjects(object):
                     CASE
                       WHEN (%(parentguid)s IS NULL)
                       THEN (parentguid is NULL)
-                      WHEN (%(parentguid)s == '')
+                      WHEN (%(parentguid)s = '')
                       THEN (parentguid is NULL)
                       ELSE (parentguid = %(parentguid)s)
                     END
