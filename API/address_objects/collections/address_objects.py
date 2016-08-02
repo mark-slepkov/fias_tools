@@ -46,7 +46,7 @@ class AddressObjects(object):
     def fetch_houses(self, aoguid):
         with self.db_connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, houseguid, aoguid, aoguid as parentguid, housenum
+                SELECT id, houseguid as aoguid, housenum
                 FROM houses
                 WHERE (aoguid = %(aoguid)s)
             """, {
